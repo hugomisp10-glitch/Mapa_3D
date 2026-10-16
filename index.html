@@ -1,0 +1,193 @@
+<!doctype html><html lang="pt-PT"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Alsácia de Natal · mapa 3D</title>
+<meta name="description" content="Mapa 3D da Alsácia no Natal: ruas, monumentos, mercados e trajetos.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎄%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font:15px system-ui,sans-serif;color:#1d2b25;display:flex;flex-direction:column;overflow:hidden}
+header{position:relative;z-index:5;background:linear-gradient(155deg,#10342a,#1f4d3d 55%,#2d614b);color:#fff;padding:10px 12px 12px;box-shadow:0 4px 14px #0004}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:8px;pointer-events:none;background:radial-gradient(circle,#ff6b6b 3px,#0000 4px) 0 2px/48px 8px repeat-x,radial-gradient(circle,#ffd36a 3px,#0000 4px) 12px 2px/48px 8px repeat-x,radial-gradient(circle,#7fe0a8 3px,#0000 4px) 24px 2px/48px 8px repeat-x,radial-gradient(circle,#8cc4f7 3px,#0000 4px) 36px 2px/48px 8px repeat-x;animation:tw 2.4s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.6}to{opacity:1}}
+h1{font:700 21px Georgia,serif;margin:0 0 8px}h1::before{content:"✦ ";color:#e0a82e;font-size:.65em}
+.row{display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none}.row::-webkit-scrollbar{display:none}
+.ch{flex:none;border:1px solid #fff4;background:#ffffff18;color:#fff;border-radius:999px;padding:6px 13px;font:inherit;font-size:13px}.ch.on{background:#fff;color:#1f4d3d}
+#q{width:100%;margin-bottom:7px;border:0;border-radius:12px;padding:10px 13px;font:inherit}
+#res{position:absolute;left:12px;right:12px;top:84px;background:#fff;color:#1d2b25;border-radius:12px;box-shadow:0 8px 30px #0005;max-height:50vh;overflow:auto;display:none;z-index:9}
+#res div{padding:10px 14px;border-bottom:1px solid #eee}#res small{color:#777}
+#wrap{flex:1;position:relative;min-height:0}#map{position:absolute;inset:0}
+#snow{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.55;background-image:radial-gradient(2px 2px at 20px 30px,#fff,#0000),radial-gradient(2px 2px at 90px 120px,#fff,#0000),radial-gradient(3px 3px at 150px 60px,#fff,#0000),radial-gradient(2px 2px at 60px 170px,#fff,#0000);background-size:200px 200px;animation:sn 16s linear infinite}
+@keyframes sn{to{background-position:-40px 200px}}
+.tools{position:absolute;right:10px;top:10px;z-index:4;display:flex;flex-direction:column;gap:8px}
+.tools button{width:44px;height:44px;border:0;border-radius:14px;background:#fffe;box-shadow:0 3px 12px #0004;font-size:18px;backdrop-filter:blur(8px)}.tools button.on{background:#1f4d3d;color:#fff}
+.bar{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4}
+.bar button{border:0;border-radius:999px;padding:12px 22px;font:600 15px system-ui;background:linear-gradient(135deg,#b3202a,#d2453d);color:#fff;box-shadow:0 6px 18px #0006}
+.mk{display:flex;flex-direction:column;align-items:center;cursor:pointer}.mk i{font-style:normal;width:36px;height:36px;border-radius:50%;border:3px solid #fff;display:grid;place-items:center;font-size:19px;box-shadow:0 3px 8px #0006;transition:transform .15s}
+.mk:hover i{transform:scale(1.18) translateY(-3px)}.mk::after{content:"";width:0;height:0;border:6px solid #0000;border-top-color:#fff;margin-top:-2px;order:1}
+.mk b{order:2;display:none;font-size:11px;font-weight:700;background:#fffe;border-radius:8px;padding:1px 6px;margin-top:1px;white-space:nowrap;box-shadow:0 1px 4px #0003}.mk.lb b{display:block}.mk.h{display:none}
+.santa{font-size:34px;filter:drop-shadow(0 3px 3px #0006);pointer-events:none}
+#sh{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;max-height:56%;overflow:auto;background:#fff;border-radius:24px 24px 18px 18px;box-shadow:0 12px 44px #0007;padding:8px 16px 16px;transform:translateY(120%);transition:transform .25s}#sh.o{transform:none}
+#sh::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 10px}
+#sh h2{font:700 21px Georgia,serif;margin:0 28px 6px 0}#sh p{line-height:1.5;margin:.4em 0}.tag{display:inline-block;background:#e8f1ec;color:#1f4d3d;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600;margin-right:4px}
+#sh a,#sh button.b{display:inline-block;margin:4px 6px 0 0;border:0;border-radius:12px;padding:10px 14px;font:600 14px system-ui;text-decoration:none;background:linear-gradient(135deg,#1f4d3d,#2f6b4a);color:#fff}#sh a.o{background:#fff;color:#1d2b25;border:1px solid #ccc}
+#x{position:absolute;right:12px;top:10px;border:0;background:#0001;border-radius:50%;width:30px;height:30px}
+.tj{border-left:4px solid #b3202a;background:#f7f4ee;border-radius:12px;padding:10px 12px;margin:8px 0;cursor:pointer}.tj small{color:#777}
+#toast{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:8;background:#b3202a;color:#fff;border-radius:12px;padding:8px 14px;display:none}
+.maplibregl-ctrl-bottom-left{bottom:62px}
+@media(prefers-reduced-motion:reduce){#snow,header::after{animation:none}}
+</style></head><body>
+<header><h1>Alsácia de Natal</h1><input id="q" placeholder="🔎 Pesquisar monumento, aldeia, mercado…" autocomplete="off"><div class="row" id="ch"></div></header>
+<div id="res"></div>
+<div id="wrap"><div id="map"></div><div id="snow"></div><div id="toast"></div>
+<div class="tools"><button id="b3" class="on" title="Inclinar 3D">🧊</button><button id="bo" title="Rodar">↻</button><button id="bs" title="Estilo do mapa">🗺</button></div>
+<div class="bar"><button id="bt">🧭 Trajetos</button></div>
+<div id="sh"><button id="x" aria-label="Fechar">✕</button><div id="shc"></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+const MKT='Mercados de Natal: em geral de finais de novembro a 24–31 dez. Confirma as datas de 2026 nos sites oficiais.';
+// tipo → [cor, ícone, nome na legenda, prioridade do rótulo, tamanho]
+const K={air:['#1767b5','plane','Aeroporto',0,1.15],city:['#b3202a','cath','Cidade',0,1.1],vil:['#d9822b','house','Aldeia',1,1],cast:['#6a4c93','castle','Castelo / monumento',2,.9],cath:['#b3202a','cath','Catedral / igreja',2,.9],canal:['#12808a','boat','Canais',2,.9],mkt:['#1f5a45','tree','Mercado de Natal',2,.9],st:['#37474f','train','Estação de comboio',3,.85],tram:['#7b3fb3','tram','Paragem de elétrico',3,.8]};
+// id,nome,tipo,lat,lon,lado,zoomMin,mercado,descrição,como chegar
+const D=[
+['bsl','EuroAirport Basel-Mulhouse-Freiburg','air',47.5896,7.5299,'l',1,0,'O aeroporto fica em território francês. Sai pelo lado França para usar os transportes alsacianos.','Autocarro 50 → Basel SBB (~20 min). Autocarro 11 → Saint-Louis (gare) (~15 min) e depois comboio TER.'],
+['baz','Basileia (Basel)','city',47.5560,7.5880,'r',1,1,'Cidade suíça junto à fronteira. Mercados de Natal em Münsterplatz e Barfüsserplatz.','Autocarro 50 desde o aeroporto até Basel SBB e elétrico para o centro.'],
+['bas','Basel SBB','st',47.5476,7.5896,'r',3,0,'Grande estação suíça, com TER para Mulhouse, Colmar e Estrasburgo.','Em francos suíços (CHF) para viagens na Suíça; para a França compra bilhete TER.'],
+['stl','Saint-Louis (gare)','st',47.5886,7.5575,'r',1.4,0,'Estação francesa mais próxima do aeroporto.','Comboio TER para Mulhouse (~15 min) e Colmar.'],
+['mul','Mulhouse','city',47.7418,7.3425,'r',1,1,'Cidade de museus. Mercado de Natal na Place de la Réunion, elétrico no centro.','Comboio TER desde Basel/Saint-Louis (~20 min).'],
+['cgare','Colmar (gare)','st',48.0713,7.3467,'l',6,0,'Estação de Colmar, a ~15 min a pé do centro.','TER Mulhouse (~25 min), Estrasburgo (~30 min). Autocarros Trace e Fluo.'],
+['col','Colmar','city',48.0794,7.3585,'r',1,1,'Cidade-base ideal: mercados no centro, casas de madeira, canais e museus.','A pé no centro. Dali saem os autocarros para as aldeias do vinho.'],
+['koi','Koïfhus (Ancienne Douane)','mkt',48.0785,7.3581,'r',7,1,'Edifício medieval com mercado de Natal na praça.','A pé do centro.'],
+['sm','Colleg. Saint-Martin','cath',48.0793,7.3579,'l',9,0,'Igreja gótica no coração da cidade velha.','A pé.'],
+['mdt','Maison des Têtes','cast',48.0790,7.3565,'l',9,0,'Casa renascentista coberta de cabeças esculpidas.','A pé.'],
+['dom','Place des Dominicains','mkt',48.0788,7.3548,'l',7,1,'Mercado de Natal junto à igreja dos Dominicanos.','A pé.'],
+['unt','Musée Unterlinden','cast',48.0803,7.3511,'l',8,0,'Museu com o Retábulo de Issenheim, em antigo convento.','A pé do centro (~10 min).'],
+['pv','Petite Venise','canal',48.0745,7.3555,'r',6,1,'Canais, casas coloridas e barcos. Mercado de Natal junto à água.','A pé do centro (~10 min).'],
+['egu','Eguisheim','vil',48.0434,7.3066,'l',1,1,'Aldeia circular com ruas concêntricas e mercado acolhedor.','Autocarro Trace desde Colmar (linha 6, confirmar).'],
+['tur','Turckheim','vil',48.0889,7.2760,'l',1,1,'Aldeia fortificada. Mercado de Natal e ronda do guarda-noturno.','Comboio TER Colmar → Turckheim (~10 min).'],
+['kay','Kaysersberg','vil',48.1386,7.2644,'l',1,1,'Terra de Albert Schweitzer, com castelo e ponte fortificada.','Autocarro Fluo desde Colmar (~30 min, confirmar linha).'],
+['rqw','Riquewihr','vil',48.1667,7.2970,'r',1,1,'Uma das aldeias mais bonitas de França. Mercado de Natal medieval.','Autocarro Fluo desde Colmar (linha 106, confirmar).'],
+['rib','Ribeauvillé','vil',48.1950,7.3190,'r',1,1,'Três castelos sobre a vila. Mercado de Natal na Grand\'Rue.','Autocarro Fluo desde Colmar ou Sélestat (confirmar).'],
+['hk','Château du Haut-Kœnigsbourg','cast',48.2494,7.3444,'r',1,0,'Castelo medieval reconstruído, muito visível do vale.','De Sélestat: navette sazonal (confirmar) ou táxi (~20 min).'],
+['sel','Sélestat','city',48.2603,7.4509,'r',1,1,'Cidade humanista e berço histórico da tradição da árvore de Natal.','TER Colmar (~15 min) e Estrasburgo (~25 min).'],
+['obe','Obernai','vil',48.4616,7.4812,'r',1,1,'Centro medieval, poço de Seis Baldes e mercado de Natal bonito.','TER Estrasburgo → Obernai (~25 min).'],
+['str','Estrasburgo','city',48.5839,7.7455,'r',1,1,'"Capitale de Noël": o maior mercado da região, espalhado pela cidade velha.','TER desde Basel/Colmar. Na cidade, elétrico (não há metro).'],
+['sgare','Estrasburgo (gare)','st',48.5850,7.7352,'l',6,0,'Estação central, junto à linha A/D do elétrico.','Elétrico A/D → Homme de Fer (~5 min).'],
+['hdf','Homme de Fer','tram',48.5843,7.7485,'r',8,0,'Principal nó de elétricos do centro.','A pé até à Catedral (~5 min).'],
+['kle','Place Kléber','mkt',48.5838,7.7455,'l',8,1,'Praça com o grande abeto de Natal.','Elétrico A/D até Homme de Fer, depois a pé.'],
+['bro','Place Broglie','mkt',48.5855,7.7503,'r',9,1,'Mercado de Natal com artesanato e comida.','A pé.'],
+['cat','Catedral de Estrasburgo','cath',48.5819,7.7511,'r',4,1,'Catedral gótica em arenito rosa, e Christkindelsmärik na praça.','A pé desde Homme de Fer.'],
+['pet','Petite France','canal',48.5802,7.7387,'l',6,1,'Casas enxaimel, canais, Pontes Cobertas e mercado de Natal.','A pé do centro (~15 min).']
+];
+
+const L=[ // modo, nome, paragens, info
+['train','TER Basel – Mulhouse – Colmar – Sélestat – Estrasburgo',['bas','stl','mul','cgare','sel','sgare'],'Linha principal. Basel → Colmar ~50–60 min, Basel → Estrasburgo ~1h15–1h30. Bilhetes na SNCF Connect ou nas máquinas das estações.'],
+['train','TER Colmar – Turckheim',['cgare','tur'],'~10 min, vale de Munster.'],
+['train','TER Estrasburgo – Obernai',['sgare','obe'],'~25 min.'],
+['bus','Autocarro 50: aeroporto – Basel SBB',['bsl','bas'],'~20 min, frequente.'],
+['bus','Autocarro 11: aeroporto – Saint-Louis',['bsl','stl'],'~15 min, liga ao comboio francês.'],
+['bus','Autocarro Colmar – Eguisheim',['col','egu'],'Rede Trace (confirmar linha e horários).'],
+['bus','Autocarro Colmar – Kaysersberg',['col','kay'],'Rede Fluo Grand Est (confirmar).'],
+['bus','Autocarro Colmar – Riquewihr – Ribeauvillé – Sélestat',['col','rqw','rib','sel'],'Rede Fluo Grand Est (linha 106, confirmar).'],
+['bus','Sélestat – Haut-Kœnigsbourg',['sel','hk'],'Navette sazonal (confirmar) ou táxi.'],
+['tram','Elétrico A/D: Gare – Homme de Fer',['sgare','hdf'],'Estrasburgo tem elétrico, não metro. ~5 min.']
+];
+const TJ=[ // título, duração, texto, linhas
+['Aeroporto → Colmar','~1h15–1h30','Autocarro 11 até Saint-Louis (gare), depois TER via Mulhouse até Colmar.',[4,0],'col'],
+['Aeroporto → Estrasburgo','~1h45–2h','Autocarro 50 até Basel SBB (ou 11 até Saint-Louis) e TER direto para Estrasburgo.',[3,4,0],'str'],
+['Colmar → Riquewihr, Ribeauvillé, Kaysersberg','~30–40 min','Autocarros Fluo a partir de Colmar. Confirma linhas e últimos horários.',[7,6],'rqw'],
+['Colmar → Eguisheim e Turckheim','10–20 min','Eguisheim de autocarro, Turckheim de comboio.',[5,1],'egu'],
+['Estrasburgo → Obernai','~25 min','TER direto. Boa aldeia para uma tarde.',[2],'obe'],
+['Sélestat → Haut-Kœnigsbourg','~20 min','Navette sazonal ou táxi.',[8],'hk'],
+['Dentro de Estrasburgo','5–15 min','Elétrico A/D até Homme de Fer e depois a pé: Kléber, Catedral, Petite France.',[9],'str']
+];
+const C={v:['🏛','#6a4c93','Visitas'],m:['🎄','#1f5a45','Mercados'],c:['🥨','#d9822b','Comer'],t:['🚉','#37474f','Transportes']};
+const ell=(c,a,b,n=28)=>Array.from({length:n+1},(_,i)=>[c[0]+a*Math.sin(i*6.2832/n),c[1]+b*Math.cos(i*6.2832/n)]);
+// ruas: [nome, principal(1/0), pontos]   POIs: [nome, cat, lat, lon, texto]
+const T=[
+{id:'col',n:'Colmar',c:[48.0788,7.3560],
+ S:[['Av. de la République',1,[[48.0713,7.3467],[48.0745,7.3500],[48.0775,7.3535],[48.0786,7.3560]]],
+  ['Rue des Clefs',1,[[48.0803,7.3511],[48.0788,7.3548],[48.0785,7.3581]]],
+  ['Rue des Marchands',0,[[48.0798,7.3562],[48.0790,7.3568],[48.0783,7.3573]]],
+  ['Grand\'Rue',0,[[48.0772,7.3552],[48.0779,7.3570],[48.0783,7.3587]]],
+  ['Quai de la Poissonnerie',0,[[48.0746,7.3538],[48.0749,7.3560],[48.0746,7.3580]]]],
+ Q:[['Maison Pfister','v',48.0794,7.3563,'Casa de 1537 com varandas de madeira e frescos. Exterior visível a qualquer hora.'],
+  ['Musée Bartholdi','v',48.0798,7.3572,'Casa natal do escultor da Estátua da Liberdade. Bilhete pago; confirma horário.'],
+  ['Marché couvert','c',48.0757,7.3548,'Mercado coberto junto ao canal: queijos, charcutaria e comida rápida. Fecha cedo e ao domingo (confirmar).'],
+  ['Pont da Poissonnerie','v',48.0746,7.3556,'Melhor ponto de vista sobre os canais de Petite Venise, bom ao fim da tarde.']]},
+{id:'str',n:'Estrasburgo',c:[48.5832,7.7470],
+ S:[['Rue du 22 Novembre',1,[[48.5849,7.7355],[48.5845,7.7400],[48.5841,7.7440],[48.5841,7.7465]]],
+  ['Grand\'Rue',1,[[48.5842,7.7410],[48.5840,7.7440],[48.5838,7.7456]]],
+  ['Rue des Grandes Arcades',1,[[48.5837,7.7480],[48.5841,7.7463],[48.5838,7.7455]]],
+  ['Rue Mercière',0,[[48.5822,7.7505],[48.5829,7.7490],[48.5836,7.7480]]],
+  ['Rue du Bain-aux-Plantes',0,[[48.5800,7.7378],[48.5805,7.7395],[48.5810,7.7415],[48.5815,7.7445]]]],
+ Q:[['Maison Kammerzell','c',48.5820,7.7507,'Casa de 1427 junto à catedral, restaurante tradicional alsaciano. Reserva em época de Natal.'],
+  ['Palais Rohan','v',48.5807,7.7517,'Palácio barroco com três museus (Artes Decorativas, Belas-Artes, Arqueologia).'],
+  ['Musée Alsacien','v',48.5793,7.7506,'Vida tradicional alsaciana em casas ligadas entre si. Bilhete pago.'],
+  ['Place Gutenberg','m',48.5836,7.7480,'Mercado de Natal e estátua de Gutenberg, a 2 min de Kléber.'],
+  ['Marché-aux-Cochons-de-Lait','v',48.5817,7.7488,'Pequena praça pitoresca ao lado da catedral.'],
+  ['Ponts Couverts','v',48.5799,7.7378,'Pontes com torres medievais sobre o rio Ill, em Petite France.'],
+  ['Barrage Vauban','v',48.5793,7.7360,'Terraço panorâmico gratuito sobre as Pontes Cobertas.']]},
+{id:'egu',n:'Eguisheim',c:[48.0434,7.3066],
+ S:[['Rue du Rempart',1,ell([48.0434,7.3066],.0011,.0018)],['Rue des Rempart intérieur',0,ell([48.0434,7.3066],.0005,.0009)],
+  ['Grand\'Rue',0,[[48.0434,7.3040],[48.0434,7.3066]]]],
+ Q:[['Château Saint-Léon-IX','v',48.0434,7.3066,'Capela no centro da aldeia circular; ponto de partida do passeio.'],
+  ['Mercado de Natal','m',48.0433,7.3062,'Pequeno mercado na Place du Château, aberto sobretudo ao fim de semana (confirmar).'],
+  ['Église Saints-Pierre-et-Paul','v',48.0431,7.3057,'Igreja da aldeia, junto às ruas interiores.']]},
+{id:'rqw',n:'Riquewihr',c:[48.1667,7.2970],
+ S:[['Rue du Général de Gaulle',1,[[48.1668,7.2990],[48.1668,7.2970],[48.1667,7.2950]]],['Rue des Juifs',0,[[48.1668,7.2975],[48.1662,7.2978]]]],
+ Q:[['Le Dolder','v',48.1668,7.2971,'Torre-porta do século XIII com vista sobre a rua principal. Subida paga em certas épocas.'],
+  ['Tour des Voleurs','v',48.1666,7.2968,'Antiga prisão e câmara de tortura, hoje museu.'],
+  ['Mercado de Natal','m',48.1665,7.2960,'No pátio do castelo e na rua principal. Chega cedo: enche ao fim de semana.']]},
+{id:'kay',n:'Kaysersberg',c:[48.1388,7.2653],
+ S:[['Rue du Général de Gaulle',1,[[48.1395,7.2685],[48.1388,7.2655],[48.1383,7.2635],[48.1379,7.2618]]]],
+ Q:[['Pont fortifié','v',48.1383,7.2634,'Ponte do século XVI sobre o rio Weiss com capela. Foto obrigatória.'],
+  ['Église Sainte-Croix','v',48.1390,7.2664,'Igreja com retábulo do século XVI.'],
+  ['Château (ruínas)','v',48.1403,7.2653,'Pequena subida a pé; vista sobre a aldeia e as vinhas.']]}
+];
+
+const $=i=>document.getElementById(i);
+const EM={air:'✈️',city:'🎅',vil:'🏡',cast:'🏰',cath:'⛪',canal:'🚣',mkt:'🎄',st:'🚆',tram:'🚋'};
+const ALL=[],byId={};
+D.forEach(d=>ALL.push({id:d[0],n:d[1],lat:d[3],lon:d[4],em:EM[d[2]],col:K[d[2]][0],pr:K[d[2]][3],d:d[8],h:d[9],mk:d[7],tp:K[d[2]][2]}));
+T.forEach(t=>t.Q.forEach(([n,c,la,lo,tx])=>ALL.push({id:t.id+n,n,lat:la,lon:lo,em:C[c][0],col:C[c][1],pr:4,d:tx,h:'',mk:c=='m',tp:C[c][2],town:t.n})));
+ALL.forEach(a=>byId[a.id]=a);
+const STY=['liberty','bright','positron'].map(s=>'https://tiles.openfreemap.org/styles/'+s);let si=0,HL=[],MKO=0,orb=0;
+const map=new maplibregl.Map({container:'map',style:STY[0],center:[7.4,48.05],zoom:8.6,pitch:50,bearing:-12,maxZoom:20,maxPitch:78,attributionControl:{compact:true}});
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-left');
+map.addControl(new maplibregl.GeolocateControl({positionOptions:{enableHighAccuracy:true},trackUserLocation:true,showUserLocation:true}),'top-left');
+map.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
+const LC={train:'#c0392b',bus:'#e08a1e',tram:'#7b3fb3'};
+const geo=()=>({type:'FeatureCollection',features:L.map((l,i)=>({type:'Feature',properties:{i,m:l[0]},geometry:{type:'LineString',coordinates:l[2].map(id=>[byId[id].lon,byId[id].lat])}}))});
+function paintHL(){if(!map.getLayer('rl'))return;map.setPaintProperty('rl','line-opacity',HL.length?['case',['in',['get','i'],['literal',HL]],1,.1]:1)}
+map.on('style.load',()=>{if(!map.getSource('r')){map.addSource('r',{type:'geojson',data:geo()});
+ map.addLayer({id:'rc',type:'line',source:'r',paint:{'line-color':'#fff','line-width':['interpolate',['linear'],['zoom'],8,5,15,10],'line-opacity':.85},layout:{'line-cap':'round'}});
+ map.addLayer({id:'rl',type:'line',source:'r',paint:{'line-color':['match',['get','m'],'train',LC.train,'bus',LC.bus,LC.tram],'line-width':['interpolate',['linear'],['zoom'],8,2.5,15,5]},layout:{'line-cap':'round'}})}paintHL()});
+map.on('error',e=>{const t=$('toast');t.textContent='Sem ligação aos mapas. Verifica a internet.';t.style.display='block';setTimeout(()=>t.style.display='none',4000)});
+ALL.forEach(a=>{const e=document.createElement('div');e.className='mk';e.innerHTML=`<i style="background:${a.col}">${a.em}</i><b>${a.n.split(' (')[0]}</b>`;e.onclick=ev=>{ev.stopPropagation();show(a,1)};a.e=e;new maplibregl.Marker({element:e,anchor:'bottom'}).setLngLat([a.lon,a.lat]).addTo(map)});
+const vis=()=>{const z=map.getZoom();ALL.forEach(a=>{a.e.classList.toggle('h',z<[0,9,10.5,12,14.5][a.pr]||(MKO&&!a.mk));a.e.classList.toggle('lb',z>=12.5)})};map.on('zoom',vis);vis();
+const gm=(a,m)=>`https://www.google.com/maps/${m}`;
+function show(a,fly){if(fly)map.flyTo({center:[a.lon,a.lat],zoom:Math.max(map.getZoom(),a.pr>=4?18:a.pr==0?14.5:16.5),pitch:62,bearing:map.getBearing()+25,duration:2200});
+ const q=encodeURIComponent(a.n+(a.town?', '+a.town:'')+', France');
+ $('shc').innerHTML=`<h2>${a.em} ${a.n}</h2><span class="tag">${a.tp}</span>${a.mk?'<span class="tag">🎄 Mercado de Natal</span>':''}<p>${a.d}</p>${a.h?`<p><b>Como chegar:</b> ${a.h}</p>`:''}${a.mk?`<p style="font-size:12px;color:#777">${MKT}</p>`:''}<a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking">🚶 Ir a pé</a><a class="o" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">🗺 Google Maps</a><a class="o" target="_blank" rel="noopener" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${a.lat},${a.lon}">👁 Street View</a>`;$('sh').classList.add('o')}
+$('x').onclick=()=>$('sh').classList.remove('o');map.on('click',()=>$('sh').classList.remove('o'));
+// chips
+const J=[['col','Colmar'],['str','Estrasburgo'],['egu','Eguisheim'],['rqw','Riquewihr'],['kay','Kaysersberg'],['baz','Basileia'],['mul','Mulhouse']];
+$('ch').innerHTML=J.map(j=>`<button class="ch" data-j="${j[0]}">🔎 ${j[1]}</button>`).join('')+'<button class="ch" id="cm">🎄 Só mercados</button>';
+$('ch').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='cm'){MKO=!MKO;b.classList.toggle('on',!!MKO);vis();return}const a=byId[b.dataset.j];map.flyTo({center:[a.lon,a.lat],zoom:15.6,pitch:64,bearing:map.getBearing()+30,duration:2800})};
+// pesquisa
+const q=$('q'),r=$('res');q.oninput=()=>{const v=q.value.trim().toLowerCase();if(v.length<2){r.style.display='none';return}const m=ALL.filter(a=>a.n.toLowerCase().includes(v)).slice(0,8);r.innerHTML=m.map(a=>`<div data-i="${ALL.indexOf(a)}">${a.em} ${a.n} <small>${a.town||a.tp}</small></div>`).join('')||'<div>Sem resultados</div>';r.style.display='block'};
+r.onclick=e=>{const d=e.target.closest('[data-i]');if(!d)return;r.style.display='none';q.value='';q.blur();show(ALL[d.dataset.i],1)};
+// ferramentas
+$('b3').onclick=e=>{const on=map.getPitch()<10;map.easeTo({pitch:on?62:0,bearing:on?map.getBearing():0,duration:900});e.currentTarget.classList.toggle('on',on)};
+$('bo').onclick=e=>{orb=!orb;e.currentTarget.classList.toggle('on',!!orb);const f=()=>{if(!orb)return;map.setBearing(map.getBearing()+.12);requestAnimationFrame(f)};if(orb)f()};
+map.on('dragstart',()=>{orb=0;$('bo').classList.remove('on')});
+$('bs').onclick=()=>{si=(si+1)%3;map.setStyle(STY[si])};
+// trajetos + Pai Natal animado
+let sa=null,raf=0;
+function santa(c){cancelAnimationFrame(raf);if(!c.length)return;if(!sa){const e=document.createElement('div');e.className='santa';e.textContent='🎅🛷';sa=new maplibregl.Marker({element:e}).setLngLat(c[0]).addTo(map)}
+ const n=c.length-1,dur=4500*n,t0=performance.now();const f=t=>{const u=((t-t0)%dur)/dur*n,i=Math.min(n-1,Math.floor(u)),k=u-i;sa.setLngLat([c[i][0]+(c[i+1][0]-c[i][0])*k,c[i][1]+(c[i+1][1]-c[i][1])*k]);raf=requestAnimationFrame(f)};raf=requestAnimationFrame(f)}
+function route(i){const t=TJ[i];HL=t[3];paintHL();let c=[];t[3].forEach(li=>{const s=L[li][2].map(id=>[byId[id].lon,byId[id].lat]);c=c.concat(s)});
+ const b=c.reduce((b,p)=>b.extend(p),new maplibregl.LngLatBounds(c[0],c[0]));map.fitBounds(b,{padding:{top:40,bottom:260,left:40,right:60},pitch:45,duration:1800,maxZoom:13});santa(c);
+ $('shc').innerHTML=`<h2>🧭 ${t[0]}</h2><span class="tag">${t[1]}</span><p>${t[2]}</p><p style="font-size:12px;color:#777">Confirma sempre linhas e horários.</p><button class="b" onclick="lista()">← Todos os trajetos</button>`}
+function lista(){HL=[];paintHL();cancelAnimationFrame(raf);if(sa){sa.remove();sa=null}$('shc').innerHTML='<h2>🧭 Trajetos</h2>'+TJ.map((t,i)=>`<div class="tj" onclick="route(${i})"><b>${t[0]}</b><br><small>${t[1]}</small></div>`).join('');$('sh').classList.add('o')}
+$('bt').onclick=lista;
+</script></body></html>
