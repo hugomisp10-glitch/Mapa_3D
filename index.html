@@ -52,7 +52,7 @@ h1{font:700 21px Georgia,serif;margin:0 0 8px}h1::before{content:"✦ ";color:#e
 #ik h3,#yc h3{margin:0 30px 6px 0;font:800 22px "Trebuchet MS",sans-serif;color:#8e1c28}#ik p{margin:.3em 0;color:#4a3a30}#kx,#yx{position:absolute;right:10px;top:8px;border:0;background:#0001;border-radius:50%;width:30px;height:30px}
 .vbtn{display:block;width:100%;margin:8px 0;padding:12px;border:0;border-radius:14px;font:700 16px system-ui;background:#e9e2d0;color:#4a3a30}.vbtn.v{background:#2fbf71;color:#fff}#kn{width:100%;border:1px solid #d6c9a8;border-radius:12px;padding:10px;font:inherit}
 #iy{position:absolute;left:0;top:0;bottom:0;width:min(86vw,340px);background:#fffaf0;padding:16px;overflow:auto;transform:translateX(-105%);transition:transform .25s;box-shadow:6px 0 30px #0006}#iy.o{transform:none}#yc h4{margin:14px 0 4px;color:#1f6a45}#yc label{display:block;padding:7px 0;color:#3a2f28}#yc input{width:20px;height:20px;vertical-align:middle;margin-right:8px}
-.mk{position:relative}.mk.vis i{box-shadow:0 0 0 4px #2fbf71,0 3px 8px #0006}.mk.vis i::before{content:"✔";position:absolute;right:-7px;top:-7px;background:#2fbf71;color:#fff;border-radius:50%;width:18px;height:18px;font:700 11px system-ui;display:grid;place-items:center;z-index:2}
+.mk i{position:relative}.mk.vis i{box-shadow:0 0 0 4px #2fbf71,0 3px 8px #0006}.mk.vis i::before{content:"✔";position:absolute;right:-7px;top:-7px;background:#2fbf71;color:#fff;border-radius:50%;width:18px;height:18px;font:700 11px system-ui;display:grid;place-items:center;z-index:2}
 
 #il{height:100dvh}#ih{padding-top:max(10px,env(safe-area-inset-top))}#itb{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding:2px 4px 6px;scrollbar-width:none}#itb button{flex:none;min-height:40px}
 #ic{right:max(10px,env(safe-area-inset-right))}#ic button{min-width:48px;height:48px}#kn{font-size:16px}
@@ -322,14 +322,15 @@ S.onpointermove=e=>{if(!pt.has(e.pointerId))return;const o=pt.get(e.pointerId);p
 S.onpointerup=e=>{pt.delete(e.pointerId);if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<7){const g=dn.t.closest&&dn.t.closest('.p');if(g)card(g.dataset.k)}dn=null};S.onpointercancel=e=>pt.delete(e.pointerId);
 addEventListener('resize',()=>el.classList.contains('o')&&fit());
 
-// ---- música de Natal (Jingle Bells, domínio público) sintetizada offline
-{const NT={C:261.63,D:293.66,E:329.63,F:349.23,G:392},SG=[['E',1],['E',1],['E',2],['E',1],['E',1],['E',2],['E',1],['G',1],['C',1.5],['D',.5],['E',4],['F',1],['F',1],['F',1.5],['F',.5],['F',1],['E',1],['E',1],['E',.5],['E',.5],['G',1],['G',1],['F',1],['D',1],['C',4]];let ac=null,mt=0,on=false;
-const nt=(f,t,d)=>{const o=ac.createOscillator(),o2=ac.createOscillator(),g=ac.createGain();o.type='triangle';o2.type='sine';o.frequency.value=f;o2.frequency.value=f*3;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.01);g.gain.exponentialRampToValueAtTime(.0008,t+d);o.connect(g);o2.connect(g);g.connect(ac.destination);o.start(t);o2.start(t);o.stop(t+d+.05);o2.stop(t+d+.05)};
-const loop=()=>{if(!on||!ac)return;let t=ac.currentTime+.05;SG.forEach(([n,d])=>{nt(NT[n],t,d*.4);nt(NT[n]/2,t,d*.4);t+=d*.42});mt=setTimeout(loop,(t-ac.currentTime+1)*1000)};
-const mb=document.createElement('button');mb.id='imu';mb.textContent='🎵';mb.title='Música de Natal';$('ic').insertBefore(mb,$('ix'));
-const stop=()=>{on=false;clearTimeout(mt);if(ac){ac.close();ac=null}mb.classList.remove('on')};
-mb.onclick=()=>{if(on){stop();return}on=true;mb.classList.add('on');ac=new(window.AudioContext||window.webkitAudioContext)();ac.resume();loop()};$('ix').addEventListener('click',stop);
-const st=document.createElement('style');st.textContent='#ic button.on{background:#2fbf71;color:#fff}.mk.pt b{display:block!important}';document.head.appendChild(st)}
+// ---- música de Natal (Jingle Bells, domínio público): WAV gerado aqui e tocado por <audio> (funciona offline e com o modo silencioso do iPhone)
+{const NT={C:261.63,D:293.66,E:329.63,F:349.23,G:392},SG=[['E',1],['E',1],['E',2],['E',1],['E',1],['E',2],['E',1],['G',1],['C',1.5],['D',.5],['E',4],['F',1],['F',1],['F',1.5],['F',.5],['F',1],['E',1],['E',1],['E',.5],['E',.5],['G',1],['G',1],['F',1],['D',1],['C',4]];
+const mkWav=()=>{const sr=22050,bt=.42,N=Math.ceil(sr*(32*bt+1.2)),d=new Float32Array(N);let t=0;SG.forEach(([n,b])=>{const f=NT[n],s0=Math.floor(t*sr),n0=Math.floor(Math.min(b*bt*1.3,1)*sr);for(let i=0;i<n0&&s0+i<N;i++){const x=i/sr,e=Math.exp(-x*4.5)*Math.min(1,x*300);d[s0+i]+=e*(.3*Math.sin(6.2832*f*x)+.1*Math.sin(6.2832*f*3*x)+.15*Math.sin(3.1416*f*x))}t+=b*bt});
+ const o=new DataView(new ArrayBuffer(44+N*2)),w=(p,s)=>[...s].forEach((c,i)=>o.setUint8(p+i,c.charCodeAt(0)));w(0,'RIFF');o.setUint32(4,36+N*2,true);w(8,'WAVEfmt ');o.setUint32(16,16,true);o.setUint16(20,1,true);o.setUint16(22,1,true);o.setUint32(24,sr,true);o.setUint32(28,sr*2,true);o.setUint16(32,2,true);o.setUint16(34,16,true);w(36,'data');o.setUint32(40,N*2,true);for(let i=0;i<N;i++)o.setInt16(44+i*2,Math.max(-1,Math.min(1,d[i]))*30000,true);return new Blob([o],{type:'audio/wav'})};
+let au=null,on=false;const bs=[];const set=v=>{on=v;bs.forEach(b=>b.classList.toggle('on',v))};
+const tgl=()=>{if(on){au&&au.pause();set(false);return}if(!au){au=new Audio();au.loop=true;au.src=URL.createObjectURL(mkWav())}const p=au.play();set(true);if(p&&p.catch)p.catch(()=>{set(false);alert('Não foi possível tocar o som. Verifica o volume e tenta outra vez.')})};
+const mk=(par,before)=>{const b=document.createElement('button');b.textContent='🎵';b.title='Música de Natal';b.setAttribute('aria-label','Música de Natal');before?par.insertBefore(b,before):par.appendChild(b);b.onclick=tgl;bs.push(b);return b};
+mk($('ic'),$('ix')).id='imu';mk(document.querySelector('.tools'));$('ix').addEventListener('click',()=>{if(on)tgl()});
+const st=document.createElement('style');st.textContent='#ic button.on,.tools button.on{background:#2fbf71;color:#fff}.mk.pt b{display:block!important}';document.head.appendChild(st)}
 // ---- 2 pontos marcados (localizados em tempo real no OpenStreetMap)
 {const PT=[['pt1','Rue de Stutzheim','Rue de Stutzheim, Strasbourg','Estrasburgo'],['pt2','Rue du Grillenbreit','Rue du Grillenbreit, Colmar','Colmar']];
 const geo=async q=>{const k='geo|'+q;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&q='+encodeURIComponent(q));const j=await r.json();if(!j[0])return null;const v=[+j[0].lon,+j[0].lat];try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}return v};
