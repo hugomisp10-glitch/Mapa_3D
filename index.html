@@ -302,7 +302,7 @@ function build(id){const t=TW[id];sd=11;const it=[],lb=[],oc=[];
  return`<g id="ig">${s}</g>`}
 const el=document.createElement('div');el.id='il';el.innerHTML=`<svg id="is">${DEFS}</svg><div id="ih"><h2 id="itl"></h2><small id="isb"></small><small id="ipg"></small><div class="row" id="itb"></div></div><div id="ic"><button id="iz">+</button><button id="im">−</button><button id="ir">⟲</button><button id="iw">📋</button><button id="iv">🗺</button><button id="ix">✕</button></div><div id="ik"><button id="kx">✕</button><div id="kc"></div></div><div id="iy"><button id="yx">✕</button><div id="yc"></div></div>`;document.body.appendChild(el);
 const S=$('is');let k=1,tx=0,ty=0,k0=1,cur='str';
-const ap=()=>{$('ig').setAttribute('transform',`translate(${tx} ${ty}) scale(${k})`);S.classList.toggle('z2',k/k0>2.6)};
+const ap=()=>{const r=S.getBoundingClientRect(),tt=TW[cur],hh=$('ih').offsetHeight*.5,WW=tt.w*k,HH=tt.h*k;tx=WW<=r.width?(r.width-WW)/2:Math.min(0,Math.max(r.width-WW,tx));ty=HH<=r.height?(r.height-HH)/2:Math.min(hh,Math.max(r.height-HH,ty));$('ig').setAttribute('transform',`translate(${tx} ${ty}) scale(${k})`);S.classList.toggle('z2',k/k0>2.6)};
 const names=id=>TW[id].pois.filter(p=>p[4]);const cnt=id=>names(id).filter(p=>ST[id+'|'+p[4]]).length;
 const prog=()=>{let a=0,b=0;Object.keys(TW).forEach(i=>{a+=cnt(i);b+=names(i).length});$('ipg').textContent=`✔ ${cnt(cur)}/${names(cur).length} aqui · ${a}/${b} no total`;S.querySelectorAll('.p').forEach(g=>{const v=!!ST[g.dataset.k];g.classList.toggle('v',v);g.querySelector('.bt').textContent=v?'✔':'+'})};
 const fit=()=>{const r=S.getBoundingClientRect(),t=TW[cur],hh=$('ih').offsetHeight+6;k0=Math.min(r.width/t.w,(r.height-hh)/t.h)*.98;k=k0*1.75;const P=names(cur),cx=P.reduce((a,p)=>a+p[1],0)/P.length,cy=P.reduce((a,p)=>a+p[2],0)/P.length-60;tx=r.width/2-cx*k;ty=hh+(r.height-hh)/2-cy*k;ap()};
@@ -321,5 +321,18 @@ const pt=new Map();let pd=0,dn=null;S.onpointerdown=e=>{dn={x:e.clientX,y:e.clie
 S.onpointermove=e=>{if(!pt.has(e.pointerId))return;const o=pt.get(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);if(pt.size==2){const[a,b]=[...pt.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoom(d/pd,(a[0]+b[0])/2,(a[1]+b[1])/2);pd=d}else{tx+=e.clientX-o[0];ty+=e.clientY-o[1];ap()}};
 S.onpointerup=e=>{pt.delete(e.pointerId);if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<7){const g=dn.t.closest&&dn.t.closest('.p');if(g)card(g.dataset.k)}dn=null};S.onpointercancel=e=>pt.delete(e.pointerId);
 addEventListener('resize',()=>el.classList.contains('o')&&fit());
+
+// ---- música de Natal (Jingle Bells, domínio público) sintetizada offline
+{const NT={C:261.63,D:293.66,E:329.63,F:349.23,G:392},SG=[['E',1],['E',1],['E',2],['E',1],['E',1],['E',2],['E',1],['G',1],['C',1.5],['D',.5],['E',4],['F',1],['F',1],['F',1.5],['F',.5],['F',1],['E',1],['E',1],['E',.5],['E',.5],['G',1],['G',1],['F',1],['D',1],['C',4]];let ac=null,mt=0,on=false;
+const nt=(f,t,d)=>{const o=ac.createOscillator(),o2=ac.createOscillator(),g=ac.createGain();o.type='triangle';o2.type='sine';o.frequency.value=f;o2.frequency.value=f*3;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.01);g.gain.exponentialRampToValueAtTime(.0008,t+d);o.connect(g);o2.connect(g);g.connect(ac.destination);o.start(t);o2.start(t);o.stop(t+d+.05);o2.stop(t+d+.05)};
+const loop=()=>{if(!on||!ac)return;let t=ac.currentTime+.05;SG.forEach(([n,d])=>{nt(NT[n],t,d*.4);nt(NT[n]/2,t,d*.4);t+=d*.42});mt=setTimeout(loop,(t-ac.currentTime+1)*1000)};
+const mb=document.createElement('button');mb.id='imu';mb.textContent='🎵';mb.title='Música de Natal';$('ic').insertBefore(mb,$('ix'));
+const stop=()=>{on=false;clearTimeout(mt);if(ac){ac.close();ac=null}mb.classList.remove('on')};
+mb.onclick=()=>{if(on){stop();return}on=true;mb.classList.add('on');ac=new(window.AudioContext||window.webkitAudioContext)();ac.resume();loop()};$('ix').addEventListener('click',stop);
+const st=document.createElement('style');st.textContent='#ic button.on{background:#2fbf71;color:#fff}.mk.pt b{display:block!important}';document.head.appendChild(st)}
+// ---- 2 pontos marcados (localizados em tempo real no OpenStreetMap)
+{const PT=[['pt1','Rue de Stutzheim','Rue de Stutzheim, Strasbourg','Estrasburgo'],['pt2','Rue du Grillenbreit','Rue du Grillenbreit, Colmar','Colmar']];
+const geo=async q=>{const k='geo|'+q;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&q='+encodeURIComponent(q));const j=await r.json();if(!j[0])return null;const v=[+j[0].lon,+j[0].lat];try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}return v};
+PT.forEach(async([id,n,q,town])=>{try{const v=await geo(q);if(!v)return;const a={id,n,lat:v[1],lon:v[0],em:'📍',col:'#c0392b',pr:0,d:'Ponto marcado: '+n+', '+town+'.',h:'',mk:false,tp:'Ponto marcado',town};const e=document.createElement('div');e.className='mk pt';e.innerHTML=`<i style="background:#c0392b">📍</i><b>${n}</b>`;e.onclick=ev=>{ev.stopPropagation();show(a,1)};a.e=e;new maplibregl.Marker({element:e,anchor:'bottom'}).setLngLat(v).addTo(map);ALL.push(a);byId[id]=a;const b=document.createElement('button');b.className='ch';b.dataset.j=id;b.textContent='📍 '+n.replace('Rue ','');$('ch').insertBefore(b,$('cm'))}catch(e){}})}
 })();
 </script></body></html>
