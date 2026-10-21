@@ -322,33 +322,21 @@ S.onpointermove=e=>{if(!pt.has(e.pointerId))return;const o=pt.get(e.pointerId);p
 S.onpointerup=e=>{pt.delete(e.pointerId);if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<7){const g=dn.t.closest&&dn.t.closest('.p');if(g)card(g.dataset.k)}dn=null};S.onpointercancel=e=>pt.delete(e.pointerId);
 addEventListener('resize',()=>el.classList.contains('o')&&fit());
 
-// ---- música de Natal (Jingle Bells, domínio público): WAV gerado aqui e tocado por <audio> (funciona offline e com o modo silencioso do iPhone)
-{const F=(n,k=0)=>261.63*Math.pow(2,(n+k)/12),nz=()=>Math.random()*2-1,sr=16000,TH={0:-3,2:-3,4:-4,5:-3,7:-3,9:-4,11:-3};
-const JB=[[4,1],[4,1],[4,2],[4,1],[4,1],[4,2],[4,1],[7,1],[0,1.5],[2,.5],[4,4],[5,1],[5,1],[5,1.5],[5,.5],[5,1],[4,1],[4,1],[4,.5],[4,.5],[7,1],[7,1],[5,1],[2,1],[0,4]];
-const WW=[[7,1],[12,1],[12,.5],[14,.5],[12,.5],[11,.5],[9,1],[9,1],[9,1],[14,1],[14,.5],[16,.5],[14,.5],[12,.5],[11,1],[7,1],[7,1],[16,1],[16,.5],[17,.5],[16,.5],[14,.5],[12,1],[9,1],[7,.5],[7,.5],[9,1],[14,1],[11,1],[12,3]];
-const SEC=[[JB,0,.33,4,2],[JB,2,.3,4,2],[WW,0,.27,3,2],[WW,5,.26,3,2],[JB,4,.28,4,2],[WW,7,.25,3,2],[JB,7,.26,4,2],[WW,2,.25,3,2],[JB,5,.25,4,2]];
-const sum=m=>m.reduce((a,x)=>a+x[1],0);
-const synth=()=>{let N=0;SEC.forEach(([m,k,bt,B,r])=>N+=sum(m)*r*bt+.4);N=Math.ceil(N*sr)+sr;const d=new Float32Array(N);let off=0;
- SEC.forEach(([m,k,bt,B,r],si)=>{const tb=sum(m);for(let rp=0;rp<r;rp++){const base=off;let t=0;
-  m.forEach(([n,b])=>{const s0=base+Math.floor(t*sr),len=Math.min(b*bt*1.5,.8)*sr|0,vs=[[n,1],[n+TH[((n%12)+12)%12],rp?.55:0],[n+12,si%2?.3:0]];for(let i=0;i<len&&s0+i<N;i++){const x=i/sr,e=Math.exp(-x*5)*Math.min(1,x*400);for(const[nn,g]of vs){if(!g)continue;const p=6.2832*F(nn,k)*x;d[s0+i]+=g*e*(.2*Math.sin(p)+.05*(Math.sin(p)>0?1:-1)+.07*Math.sin(p*3.01))}}t+=b*bt});
-  for(let q=0;q<Math.floor(tb*2);q++){const s0=base+Math.floor(q*bt/2*sr),beat=q>>1,on=q%2==0;
-   for(let i=0;i<sr*.06&&s0+i<N;i++)d[s0+i]+=(on?.07:.1)*nz()*Math.exp(-i/sr*140);
-   if(on){if(B==4||beat%B==0)for(let i=0;i<sr*.18&&s0+i<N;i++){const x=i/sr;d[s0+i]+=.55*Math.sin(6.2832*55*x*(1+3*Math.exp(-x*40)))*Math.exp(-x*14)}
-    if(B==4?beat%2==1:beat%3==2)for(let i=0;i<sr*.14&&s0+i<N;i++){const x=i/sr;d[s0+i]+=.25*nz()*Math.exp(-x*30)}
-    for(let i=0;i<sr*.25&&s0+i<N;i++){const x=i/sr;d[s0+i]+=.28*Math.sin(6.2832*F(beat%2?-17:-24,k)*x)*Math.exp(-x*9)}}}
-  off+=Math.ceil(tb*bt*sr)}off+=Math.ceil(.4*sr)});
- let mx=.01;for(let i=0;i<N;i++)mx=Math.max(mx,Math.abs(d[i]));for(let i=0;i<N;i++)d[i]/=mx*1.1;return d};
-const mkWav=()=>{const d=synth(),N=d.length;const o=new DataView(new ArrayBuffer(44+N*2)),w=(p,s)=>[...s].forEach((c,i)=>o.setUint8(p+i,c.charCodeAt(0)));w(0,'RIFF');o.setUint32(4,36+N*2,true);w(8,'WAVEfmt ');o.setUint32(16,16,true);o.setUint16(20,1,true);o.setUint16(22,1,true);o.setUint32(24,sr,true);o.setUint32(28,sr*2,true);o.setUint16(32,2,true);o.setUint16(34,16,true);w(36,'data');o.setUint32(40,N*2,true);for(let i=0;i<N;i++)o.setInt16(44+i*2,Math.max(-1,Math.min(1,d[i]))*30000,true);return new Blob([o],{type:'audio/wav'})};
-let au=null,on=false;const bs=[];const set=v=>{on=v;bs.forEach(b=>b.classList.toggle('on',v))};
-const tgl=()=>{if(on){au&&au.pause();set(false);return}if(!au){au=new Audio();au.loop=true;au.src=URL.createObjectURL(mkWav())}const p=au.play();set(true);if(p&&p.catch)p.catch(()=>{set(false);alert('Não foi possível tocar o som. Verifica o volume e tenta outra vez.')})};
-const mk=(par,before)=>{const b=document.createElement('button');b.textContent='🎵';b.title='Música de Natal';b.setAttribute('aria-label','Música de Natal');before?par.insertBefore(b,before):par.appendChild(b);b.onclick=tgl;bs.push(b);return b};
-const inp=document.createElement('input');inp.type='file';inp.accept='audio/*';inp.style.display='none';document.body.appendChild(inp);inp.onchange=()=>{const f=inp.files[0];if(!f)return;if(!au)au=new Audio();au.loop=true;au.src=URL.createObjectURL(f);au.play().then(()=>set(true)).catch(()=>alert('Não foi possível tocar este ficheiro.'))};
-const add=(par,bf)=>{const m=mk(par,bf);if(par.id=='ic')m.id='imu';const g=document.createElement('button');g.textContent='🎧';g.title='Ouvir All I Want for Christmas Is You';g.setAttribute('aria-label','Ouvir a canção original');g.onclick=()=>window.open('https://www.youtube.com/results?search_query=All+I+Want+For+Christmas+Is+You','_blank');const f=document.createElement('button');f.textContent='📂';f.title='Tocar um ficheiro de música meu';f.setAttribute('aria-label','Tocar o meu ficheiro de música');f.onclick=()=>inp.click();[g,f].forEach(b=>bf?par.insertBefore(b,bf):par.appendChild(b))};
-add($('ic'),$('ix'));add(document.querySelector('.tools'));$('ix').addEventListener('click',()=>{if(on)tgl()});
+// ---- música de Natal: faixas da pasta audio/ por ordem aleatória (sem repetir até tocarem todas)
+{const TR=['audio/all-i-want.m4a','audio/las-christmas.m4a','audio/polar-express.m4a'];let bag=[],last=-1,au=null,on=false,muted=false,warned=false;try{muted=localStorage.getItem('alsacia_mute')=='1'}catch(e){}
+const bs=[],set=v=>{on=v;bs.forEach(b=>b.classList.toggle('on',v))},sm=v=>{muted=v;try{localStorage.setItem('alsacia_mute',v?'1':'0')}catch(e){}};
+const pick=()=>{if(!bag.length){bag=TR.map((_,i)=>i).sort(()=>Math.random()-.5);if(bag.length>1&&bag[0]==last)bag.push(bag.shift())}last=bag.shift();return TR[last]};
+const go=()=>{au.src=pick();return au.play().then(()=>set(true)).catch(()=>set(false))};
+const init=()=>{if(au)return;au=new Audio();au.preload='auto';au.onended=go;au.onerror=()=>{set(false);if(!warned){warned=true;alert('Não encontrei a música. Coloca a pasta "audio" junto do index.html.')}}};
+const play=()=>{init();if(!au.src)go();else au.play().then(()=>set(true)).catch(()=>set(false))};
+const tgl=()=>{if(on){au.pause();set(false);sm(true)}else{sm(false);play()}};
+const mk=(p,bf,t,ti,fn,tg)=>{const b=document.createElement('button');b.textContent=t;b.title=ti;b.setAttribute('aria-label',ti);bf?p.insertBefore(b,bf):p.appendChild(b);b.onclick=fn;if(tg)bs.push(b);return b};
+[[$('ic'),$('ix')],[document.querySelector('.tools'),null]].forEach(([p,bf])=>{const m=mk(p,bf,'🎵','Música de Natal',tgl,1);if(p.id=='ic')m.id='imu';mk(p,bf,'⏭','Próxima música',()=>{init();sm(false);go()})});
+$('bi').addEventListener('click',()=>{if(!muted&&!on)play()});$('ix').addEventListener('click',()=>{if(on){au.pause();set(false)}});
 const st=document.createElement('style');st.textContent='#ic button.on,.tools button.on{background:#2fbf71;color:#fff}.mk.pt b{display:block!important}';document.head.appendChild(st)}
 // ---- 2 pontos marcados (localizados em tempo real no OpenStreetMap)
 {const PT=[['pt1','Rue de Stutzheim','Rue de Stutzheim, Strasbourg','Estrasburgo'],['pt2','Rue du Grillenbreit','Rue du Grillenbreit, Colmar','Colmar']];
 const geo=async q=>{const k='geo|'+q;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&q='+encodeURIComponent(q));const j=await r.json();if(!j[0])return null;const v=[+j[0].lon,+j[0].lat];try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}return v};
 let pend=PT.length,bad=[];const say=t=>{const e=$('toast');e.style.background='#1f6a45';e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',6000)};PT.forEach(async([id,n,q,town])=>{try{const v=await geo(q);if(!v){bad.push(n);return}const a={id,n,lat:v[1],lon:v[0],em:'📍',col:'#c0392b',pr:0,d:'Ponto marcado: '+n+', '+town+'.',h:'',mk:false,tp:'Ponto marcado',town};const e=document.createElement('div');e.className='mk pt';e.innerHTML=`<i style="background:#c0392b">📍</i><b>${n}</b>`;e.onclick=ev=>{ev.stopPropagation();show(a,1)};a.e=e;new maplibregl.Marker({element:e,anchor:'bottom'}).setLngLat(v).addTo(map);ALL.push(a);byId[id]=a;const b=document.createElement('button');b.className='ch';b.dataset.j=id;b.textContent='📍 '+n.replace('Rue ','');$('ch').insertBefore(b,$('cm'))}catch(e){bad.push(n)}finally{if(!--pend)say(bad.length?'📍 Não localizei: '+bad.join(', '):'📍 2 pontos marcados no mapa')}})}
 })();
-</script><div style="position:fixed;left:6px;bottom:2px;z-index:99;font:10px system-ui;color:#fff9;pointer-events:none;text-shadow:0 1px 2px #000">v11</div></body></html>
+</script><div style="position:fixed;left:6px;bottom:2px;z-index:99;font:10px system-ui;color:#fff9;pointer-events:none;text-shadow:0 1px 2px #000">v12</div></body></html>
